@@ -3,11 +3,13 @@
 
 import datetime
 from app import app
-from models import db, Employee, Meeting, Project
+from models import db, Employee, Meeting, Project, employee_meetings
 
 with app.app_context():
 
     # Delete all rows in tables
+    db.session.query(employee_meetings).delete()
+    db.session.commit()
     Employee.query.delete()
     Meeting.query.delete()
     Project.query.delete()
@@ -28,7 +30,7 @@ with app.app_context():
     m2 = Meeting(topic="Github Issues Brainstorming",
                  scheduled_time=datetime.datetime(
                      2023, 12, 1, 15, 15),
-                 location="Building D, Room 430")
+                 location="Building D, Room 430")    
     db.session.add_all([m1, m2])
     db.session.commit()
 
@@ -39,5 +41,14 @@ with app.app_context():
     db.session.commit()
 
     # Many-to-many relationship between employee and meeting
+
+    # Add meetings to an employee:
+    e1.meetings.append(m1)
+    e1.meetings.append(m2)
+    # Add employees to a meeting
+    m2.employees.append(e2)
+    m2.employees.append(e3)
+    m2.employees.append(e4)
+    db.session.commit()
 
     # Many-to-many relationship between employee and project through assignment
